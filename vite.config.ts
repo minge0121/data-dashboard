@@ -5,6 +5,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/data-dashboard/', // 用于部署，必须添加此行
   plugins: [tailwindcss(),react()], // 插件配置。让 Vite 识别并编译 Tailwind CSS 样式，让 Vite 支持 React（JSX/TSX 热更新、编译）
   resolve: { // 控制 Vite 怎么找文件、怎么识别路径。
     alias: { // (路径)别名配置
