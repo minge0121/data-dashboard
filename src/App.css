@@ -1,0 +1,156 @@
+/* ==================== 全局基础样式 ==================== */
+:root {
+  --accent: #00e0ff;
+  --accent-dim: rgba(0, 224, 255, 0.15);
+  --glow-sm: 0 0 8px rgba(0, 224, 255, 0.2);
+  --glow-md: 0 0 20px rgba(0, 224, 255, 0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  font-family: "Noto Sans SC", sans-serif;
+  background: #060d1f;
+  color: #e8edf3;
+}
+
+/* ==================== 背景层：网格 + 光晕 ==================== */
+/* 知识点：多层 background 叠加，创造有深度的背景 */
+.screen-bg {
+  background:
+        /* 中心光晕 */
+    radial-gradient(
+      ellipse 60% 50% at 50% 40%,
+      rgba(0, 224, 255, 0.04) 0%,
+      transparent 70%
+    ),
+    /* 左上角微光 */
+    radial-gradient(
+        ellipse 30% 30% at 15% 20%,
+        rgba(0, 230, 118, 0.03) 0%,
+        transparent 60%
+      ),
+    /* 网格线：用重复线性渐变画 */
+    repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 59px,
+        rgba(0, 224, 255, 0.03) 59px,
+        rgba(0, 224, 255, 0.03) 60px
+      ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 59px,
+      rgba(0, 224, 255, 0.03) 59px,
+      rgba(0, 224, 255, 0.03) 60px
+    ),
+    /* 最底层纯色 */ #060d1f;
+}
+
+/* ==================== 科技感卡片 ==================== */
+.tech-card {
+  background:
+    linear-gradient(var(--accent), var(--accent)) top left / 18px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top left / 2px 18px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top right / 18px 2px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) top right / 2px 18px no-repeat,
+    linear-gradient(var(--accent), var(--accent)) bottom left / 18px 2px
+      no-repeat,
+    linear-gradient(var(--accent), var(--accent)) bottom left / 2px 18px
+      no-repeat,
+    linear-gradient(var(--accent), var(--accent)) bottom right / 18px 2px
+      no-repeat,
+    linear-gradient(var(--accent), var(--accent)) bottom right / 2px 18px
+      no-repeat,
+    rgba(8, 24, 58, 0.75);
+  border: 1px solid rgba(0, 224, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border-radius: 4px;
+}
+
+/* ==================== 标题装饰线 ==================== */
+.title-line {
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), rgba(0, 224, 255, 0.1));
+  box-shadow: var(--glow-sm);
+}
+
+/* ==================== 滚动列表 ==================== */
+@keyframes scrollUp {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+.scroll-list {
+  animation: scrollUp 25s linear infinite;
+}
+.scroll-list:hover {
+  animation-play-state: paused;
+}
+
+/* ==================== 呼吸光效 ==================== */
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* ==================== 指标卡片底部色条 ==================== */
+.indicator-bar {
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--bar-color, var(--accent)),
+    transparent
+  );
+}
+
+/* ==================== 标题文字光效 ==================== */
+.glow-text {
+  text-shadow:
+    0 0 20px rgba(0, 224, 255, 0.3),
+    0 0 40px rgba(0, 224, 255, 0.1);
+}
+
+/* ==================== 模块小标题 ==================== */
+.module-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #e8edf3;
+  padding-left: 10px;
+  border-left: 3px solid var(--accent);
+  line-height: 1;
+}
+
+/* 减弱动效偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-list {
+    animation: none;
+  }
+  .breathe {
+    animation: none;
+    opacity: 0.7;
+  }
+}
