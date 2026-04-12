@@ -1,9 +1,9 @@
-前端框架：React + TypeScript + 模块化组件设计
-数据可视化：ECharts库 + echarts-for-react库 实现复杂图表渲染
-响应式单位：在Tailwind CSS和原生CSS中，采用 vw/值，实现页面流畅的等比例缩放
-适配方案：结合min-width限制和overflow处理，实现了1200寸覆盖
-图表优化：封装通用图表组件与公共React Hook代码，
-性能优化：使用requestAnimationFrame实现平滑的数排重绘。对ECharts按需引入减少打包体积
+- 前端框架：React + TypeScript + 模块化组件设计
+- 数据可视化：ECharts库 + echarts-for-react库 实现复杂图表渲染
+- 响应式单位：在Tailwind CSS和原生CSS中，采用 vw/值，实现页面流畅的等比例缩放
+- 适配方案：结合min-width限制和overflow处理，实现了1200寸覆盖
+- 图表优化：封装通用图表组件与公共React Hook代码，
+- 性能优化：使用requestAnimationFrame实现平滑的数排重绘。对ECharts按需引入减少打包体积
 
 
 # 数据大屏的自适应实现？
