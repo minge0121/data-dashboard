@@ -47,6 +47,7 @@ interface MapChartProps {
 // ========= 常量 =========
 
 const GEO_DATA_URL = "https://geo.datav.aliyun.com/areas_v3/bound/geojson";
+const LOCAL_GEO_PATH = "./geojson"; // public/geojson/ 目录。发布到github page后，接口可能调不通，改为访问本地数据
 const ADCODE_CHINA = "100000";
 
 // ========= 地图组件 =========
@@ -89,11 +90,49 @@ const MapChartViewBoard: React.FC<MapChartProps> = ({
   const fetchMapData = useCallback(async (adcode: string, level: number) => {
     setLoading(true);
     try {
-      const url = `${GEO_DATA_URL}?code=${adcode}_full`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("地图数据加载失败");
+      let data: GeoJsonData;
+      try {
+        // 测试
+        throw new Error("测试错误");
+        // 测试结束
+        const url = `${GEO_DATA_URL}?code=${adcode}_full`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`地图数据在线加载接口响应异常:${response.status}`);
+        }
+        data = await response.json();
+      } catch (onlineError) {
+        console.warn("在线地图服务不可用，切换到本地数据:", onlineError);
+        // 策略2：降级到本地数据
+        try {
+          const localPath = `${LOCAL_GEO_PATH}/${adcode}.json`;
 
-      const data: GeoJsonData = await response.json();
+          const localResponse = await fetch(localPath);
+          if (!localResponse.ok) {
+            throw new Error(`本地数据加载失败: ${localResponse.status}`);
+          }
+          data = await localResponse.json();
+        } catch (localError) {
+          console.error(`[Map] 本地数据也失败:`, localError);
+
+          // 策略3：如果当前是省级，且没有本地数据，尝试使用全国数据兜底
+          if (level > 0) {
+            try {
+              const fallbackResponse = await fetch(
+                `${LOCAL_GEO_PATH}/100000.json`
+              );
+              if (fallbackResponse.ok) {
+                data = await fallbackResponse.json();
+                console.warn(`[Map] 使用全国数据兜底显示`);
+                // 降级为显示全国，重置层级
+                setCurrentLevel(0);
+              }
+            } catch {
+              // 最终失败
+            }
+          }
+        }
+      }
 
       // 避免重复注册同名地图（即使重新请求同一区域）
       const registerName = adcode === ADCODE_CHINA ? "china" : adcode;
