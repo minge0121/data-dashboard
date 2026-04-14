@@ -89,12 +89,12 @@ const MapChartViewBoard: React.FC<MapChartProps> = ({
   // 统一获取地图数据，并registerMap注册地图，生成 mock 数据
   const fetchMapData = useCallback(async (adcode: string, level: number) => {
     setLoading(true);
+
     try {
-      let data: GeoJsonData;
+      let data: GeoJsonData | null = null;
+
       try {
-        // 测试
-        throw new Error("测试错误");
-        // 测试结束
+        // 策略一：接口访问数据
         const url = `${GEO_DATA_URL}?code=${adcode}_full`;
         const response = await fetch(url);
         if (!response.ok) {
@@ -114,25 +114,31 @@ const MapChartViewBoard: React.FC<MapChartProps> = ({
           data = await localResponse.json();
         } catch (localError) {
           console.error(`[Map] 本地数据也失败:`, localError);
-
           // 策略3：如果当前是省级，且没有本地数据，尝试使用全国数据兜底
           if (level > 0) {
             try {
               const fallbackResponse = await fetch(
-                `${LOCAL_GEO_PATH}/100000.json`
+                `${LOCAL_GEO_PATH}/100000.json`,
               );
               if (fallbackResponse.ok) {
                 data = await fallbackResponse.json();
                 console.warn(`[Map] 使用全国数据兜底显示`);
                 // 降级为显示全国，重置层级
                 setCurrentLevel(0);
+              } else {
+                throw new Error("全国兜底数据加载失败");
               }
             } catch {
-              // 最终失败
+              throw new Error("所有数据源均失败");
             }
+          } else {
+            throw new Error("全国数据加载失败");
           }
         }
       }
+
+      // 此时 data 一定有值（GeoJsonData），否则已经 throw
+      if (!data) throw new Error("未能获取到有效地图数据");
 
       // 避免重复注册同名地图（即使重新请求同一区域）
       const registerName = adcode === ADCODE_CHINA ? "china" : adcode;
