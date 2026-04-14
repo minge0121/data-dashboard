@@ -14,8 +14,20 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
       "@components": path.resolve(__dirname, "src/components"),
       "@utils": path.resolve(__dirname, "src/utils"),
+      "@hooks": path.resolve(__dirname, "src/hooks"),
     },
     extensions: [".ts", ".tsx", ".js", ".jsx", ".json"], // (文件)扩展名配置。省略导入文件扩展名时，vite自动按顺序识别查找文件
+  },
+  server: {
+    port: 3000,
+    // 配置代理解决跨域（开发环境）
+    proxy: {
+      '/geo': {
+        target: 'https://geo.datav.aliyun.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/geo/, ''),
+      },
+    },
   },
   build: {
     outDir: "dist",

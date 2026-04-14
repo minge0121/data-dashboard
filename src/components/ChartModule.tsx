@@ -1,5 +1,5 @@
 // 模块容器组件（带标题的卡片）
-export function ChartModule({
+const ChartModule = ({
   title,
   children,
   className = "",
@@ -7,7 +7,7 @@ export function ChartModule({
   title: string;
   children?: React.ReactNode;
   className?: string;
-}) {
+}) => {
   return (
     <div className={`tech-card p-3 flex flex-col overflow-hidden ${className}`}>
       <div className="module-title mb-3 flex-shrink-0">{title}</div>
@@ -15,3 +15,4 @@ export function ChartModule({
     </div>
   );
 }
+export default ChartModule;

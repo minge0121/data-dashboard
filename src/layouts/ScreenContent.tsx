@@ -1,27 +1,59 @@
 // 大屏内容: 图表、组件、业务代码
 // 引入指标卡片区组件
-import { IndicatorCardViewBorad } from "@/components/IndicatorCardViewBoard";
-import { ChartModule } from "@/components/ChartModule";
-import { BarChartViewBoard } from "@/components/BarChartViewBoard";
-import { PieChartViewBoard } from "@/components/PieChartViewBoard";
+import IndicatorCardViewBorad from "@/components/IndicatorCardViewBoard";
+import ChartModule from "@/components/ChartModule";
+import BarChartViewBoard from "@/components/BarChartViewBoard";
+import PieChartViewBoard from "@/components/PieChartViewBoard";
 import AreaChartViewBoard from "@/components/AreaChartViewBoard";
 import RadarChartViewBoard from "@/components/RadarChartViewBoard";
-import EventList from "@/components/EventListViewBoard";
+// import EventList from "@/components/EventListViewBoard";
 // 引入hooks
-import { useCurrentTime } from "@utils/useCurrentTime";
+import {useCurrentTime} from "@hooks/useCurrentTime";
+import { useCallback, useMemo, useState } from "react";
+import MapChartViewBoard from "@/components/MapChartViewBoard";
+import { getRegionData } from "@/utils/mockData";
+import type { RegionData2025 } from "@/utils/mockData";
+
+interface RegionInfo {
+  name: string;
+  level: number;
+}
 
 const ScreenContent = () => {
-  // 获取当前时间
+  // 获取当前时间（这个会不断的更新视图，因为里面useState会不断更新state）
   const currentTime = useCurrentTime();
+
+  const [selectedRegion, setSelectedRegion] = useState<RegionInfo>({
+    name: "全国",
+    level: 0,
+  });
+
+  // 获取当前区域数据
+  const regionData = useMemo<RegionData2025>(
+    () => getRegionData(selectedRegion.name, selectedRegion.level),
+    [selectedRegion.name, selectedRegion.level],
+  );
+
+  // 判断是否为全国视图
+  const isNational = useMemo(
+    () => selectedRegion.level === 0 || selectedRegion.name === "全国",
+    [selectedRegion.level, selectedRegion.name],
+  );
+
+  const handleRegionSelect = useCallback(
+    (regionName: string, regionLevel: number) => {
+      setSelectedRegion({
+        name: regionName,
+        level: regionLevel,
+      });
+    },
+    []  // 空依赖数组
+  );
 
   return (
     // 主容器
     // h-screen、w-screen：视口高度、宽度。祖先明确可计算的高度、宽度 --> 子元素（图表容器）height:100%、width:100%才能生效
     <div className="screen-bg w-full h-full flex flex-col overflow-hidden">
-      {/* 网格背景：两个渐变叠加成的一个淡淡的、科技感的方格网格线 */}
-      {/* <div className="bg-[linear-gradient(rgba(8,22,45,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(8,22,45,0.2)_1px,transparent_1px)] bg-[length:48px_48px] pointer-events-none" /> */}
-      {/* 边框效果 */}
-      {/* <div className="border border-cyan-300/10 pointer-events-none" /> */}
       {/* ==================== 顶部标题栏 ==================== */}
       <header className="flex-shrink-0 px-6 pt-4 pb-2">
         <div className="flex items-center justify-between">
@@ -36,7 +68,7 @@ const ScreenContent = () => {
           {/* 中间标题 */}
           <div className="text-center text-slate-400">
             <h1 className="text-3xl font-bold mt-1 tracking-widest font-body">
-              智 慧 城 市 数 据 监 控 中 心 大 屏 可 视 化 平 台
+              数 据 中 心 大 屏 可 视 化 平 台
             </h1>
             <p className="mt-2 text-xl tracking-wide ">
               统一监测 · 实时预警 · 分发分析
@@ -68,37 +100,72 @@ const ScreenContent = () => {
       <main className="flex-1 min-h-0 px-6 pb-6 grid grid-cols-12 grid-rows-2 gap-3">
         {/* 左列：占 3 列 */}
         <div className="col-span-12 md:col-span-3 md:[grid-area:1/1/2/4]">
-          <ChartModule title="各区域人口分布" className="h-full">
+          <ChartModule title="GDP数据" className="h-full">
             {/* 柱状图 */}
-            <BarChartViewBoard />
+            <BarChartViewBoard
+              regionName={selectedRegion.name}
+              regionData={regionData}
+              isNational={isNational}
+            />
           </ChartModule>
-          </div>
-          <div className="col-span-12 md:col-span-3 md:[grid-area:2/1/3/4]">
-          <ChartModule title="产业结构占比" className="h-full">
+        </div>
+        <div className="col-span-12 md:col-span-3 md:[grid-area:2/1/3/4]">
+          <ChartModule title="产业占比" className="h-full">
             {/* 环形图(饼图) */}
-            <PieChartViewBoard />
+            <PieChartViewBoard
+              regionName={selectedRegion.name}
+              regionData={regionData}
+              isNational={isNational}
+            />
           </ChartModule>
-          </div>
+        </div>
 
         {/* 中列：占 6 列 */}
         <div className="col-span-12 md:col-span-6 md:[grid-area:1/4/3/10]">
-          <ChartModule title="24小时交通流量趋势" className="h-full">
-            {/* 两个折线图 */}
-            <AreaChartViewBoard />
+          <ChartModule title="地图" className="h-full">
+            <div style={{ marginBottom: "10px" }}>
+              <h2 style={{ margin: 0, color: "#666", fontSize: "16px" }}>
+                当前选中：{selectedRegion.name} | 级别：
+                {selectedRegion.level === 0
+                  ? "全国"
+                  : selectedRegion.level === 1
+                    ? "省级"
+                    : "市级"}
+              </h2>
+              <p
+                style={{ margin: "5px 0 0 0", color: "#999", fontSize: "12px" }}
+              >
+                提示：点击地图区域可下钻查看详情，点击"返回上级"可回到上一级视图
+              </p>
+            </div>
+            <MapChartViewBoard onRegionSelect={handleRegionSelect} />
           </ChartModule>
-          </div>
+        </div>
 
         {/* 右列：占 3 列 */}
         <div className="col-span-12 md:col-span-3 md:[grid-area:1/10/2/13]">
-          <ChartModule title="城市安全评分" className="h-full">
-            <RadarChartViewBoard />
+          <ChartModule title="安全指标" className="h-full">
+            {/* 雷达图 */}
+            <RadarChartViewBoard
+              regionName={selectedRegion.name}
+              regionData={regionData}
+              isNational={isNational}
+            />
           </ChartModule>
-          </div>
-          <div className="col-span-12 md:col-span-3 md:[grid-area:2/10/3/13]">
-          <ChartModule title="实时事件监控" className="h-full overflow-hidden">
-            <EventList />
+        </div>
+        <div className="col-span-12 md:col-span-3 md:[grid-area:2/10/3/13]">
+          <ChartModule
+            title="人口趋势（近5年）"
+            className="h-full overflow-hidden"
+          >
+            {/* 折线图 */}
+            <AreaChartViewBoard
+              regionName={selectedRegion.name}
+              regionData={regionData}
+              isNational={isNational}
+            />
           </ChartModule>
-          </div>
+        </div>
       </main>
 
       {/* ==================== 底部装饰条 ==================== */}

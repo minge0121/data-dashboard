@@ -7,6 +7,7 @@ interface ScaleResult {
   screenH: number;
 }
 
+// 屏幕缩放Hook
 export function useScreenScale(
   designW: number,
   designH: number,
