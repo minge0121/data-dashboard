@@ -267,7 +267,7 @@ const generateProvinceCitiesData = (provinceName: string): RegionData2025 => {
   
   // 生成7个模拟城市
   const cityNames = ["A市", "B市", "C市", "D市", "E市", "F市", "G市"].map(
-    (c, i) => `${provinceName.slice(0, 2)}${String.fromCharCode(65 + i)}市`
+    (_, i) => `${provinceName.slice(0, 2)}${String.fromCharCode(65 + i)}市`
   );
   
   return {

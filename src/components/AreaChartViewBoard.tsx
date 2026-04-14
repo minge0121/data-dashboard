@@ -37,8 +37,9 @@ const AreaChartViewBoard = ({
         // “默认格式”:
         //    第一行：X 轴的刻度标签（如果是类目轴）或数值（如果是数值轴）
         //    后续行：每个系列的名称 + 对应的数值
-        formatter: (params: CallbackDataParams) => {
-          return `${params[0].name}年<br/>人口: ${params[0].value} 万人`;
+        formatter: (params: unknown) => {
+          const data = Array.isArray(params) ? params[0] : params;
+          return `${data.name}年<br/>人口: ${data.value} 万人`;
         },
       },
       // 只有一个系列，不需要图例
